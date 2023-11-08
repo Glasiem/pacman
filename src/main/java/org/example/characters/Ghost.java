@@ -21,6 +21,10 @@ public class Ghost {
     public void moveGhost(Graphics2D g2d, Pacman pacman, Board board) {
 
 
+        countdownTimer --;
+        if(countdownTimer <= 0){
+            flipAttack();
+        }
         if (x % BLOCK_SIZE == 0 && y % BLOCK_SIZE == 0) {
             getAIMove(pacman);
         }
@@ -66,17 +70,12 @@ public class Ghost {
 //            System.out.println("!isAttacking");
             targetX = Board.screenData.length*BLOCK_SIZE - pm.getX();
             targetY = Board.screenData.length*BLOCK_SIZE - pm.getY();
-            countdownTimer --;
         } else {
 //            System.out.println("Attacking!!!");
             targetX = pm.getX();
             targetY = pm.getY();
-            countdownTimer --;
         }
 
-            if(countdownTimer <= 0){
-                flipAttack();
-            }
 
             tryMove(curX, curY, targetX, targetY);
         lastDirectionX = dx;

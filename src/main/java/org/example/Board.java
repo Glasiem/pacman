@@ -20,6 +20,7 @@ public class Board extends JPanel implements ActionListener {
     private final Font smallFont = new Font("Helvetica", Font.BOLD, 14);
     private List<Ghost> ghosts = new ArrayList<Ghost>();
     private Pacman pacman;
+    private int count = 0;
 
     public static final int BLOCK_SIZE = 24;
     public static final int N_BLOCKS = 17;
@@ -48,7 +49,7 @@ public class Board extends JPanel implements ActionListener {
             {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
     };
 
-    private static final int[] validSpeeds = {1, 2, 3, 4, 6, 8};
+    private static final int[] validSpeeds = {2, 3, 0, 6, 4};
     public static final int maxSpeed = 6;
     public static int currentSpeed = 3;
     public static short[][] screenData;
@@ -82,7 +83,7 @@ public class Board extends JPanel implements ActionListener {
             ghosts.add(new Ghost());
         }
         maze = new Maze();
-        pacman = new Pacman(7 * BLOCK_SIZE,11 * BLOCK_SIZE, 0, 0);
+        pacman = new Pacman(8 * BLOCK_SIZE,12 * BLOCK_SIZE, 0, 0);
 
         timer = new Timer(40, this);
         timer.start();
@@ -100,11 +101,16 @@ public class Board extends JPanel implements ActionListener {
         if (pacman.isDying()) {
             pacman.death(ghosts);
         } else {
-
+            count++;
             pacman.movePacman();
             pacman.drawPacman(g2d, this);
             for (Ghost ghost: ghosts) {
-                ghost.moveGhost(g2d,pacman,this);
+                if (count == 6 && ghost.getSpeed() == 6){
+                    count = 0;
+                    ghost.drawGhost(g2d, ghost.getX() + 1, ghost.getY() + 1, this);
+                } else {
+                    ghost.moveGhost(g2d, pacman, this);
+                }
             }
             maze.checkMaze(this);
         }
@@ -143,6 +149,7 @@ public class Board extends JPanel implements ActionListener {
 
     public void initGame() {
         score = 0;
+        pacman.setPacsLeft(3);
         initLevel();
         currentSpeed = 3;
     }
@@ -161,27 +168,24 @@ public class Board extends JPanel implements ActionListener {
 
     public static void continueLevel(List<Ghost> ghosts, Pacman pacman) {
 
-        short i;
+        short i = 0;
         int dx = 1;
         int random;
 
         for (Ghost ghost: ghosts) {
-            ghost.setY(4 * BLOCK_SIZE);
-            ghost.setX(4 * BLOCK_SIZE);
+            ghost.setY(7 * BLOCK_SIZE);
+            ghost.setX((6 + i) * BLOCK_SIZE);
             ghost.setDy(0);
             ghost.setDx(dx);
             dx = -dx;
-            random = (int) (Math.random() * (currentSpeed + 1));
 
-            if (random > currentSpeed) {
-                random = currentSpeed;
-            }
-
-            ghost.setSpeed(validSpeeds[random]);
+            ghost.setSpeed(validSpeeds[i]);
+            i++;
+            if (i == 2) i++;
         }
 
-        pacman.setX(7 * BLOCK_SIZE);
-        pacman.setY(11 * BLOCK_SIZE);
+        pacman.setX(8 * BLOCK_SIZE);
+        pacman.setY(12 * BLOCK_SIZE);
         pacman.setD_x(0);
         pacman.setD_y(0);
         pacman.setReq_dx(0);
